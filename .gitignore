@@ -6,3 +6,5 @@ edge/state/state.db-shm
 run/
 logs/
 memory/short_term.jsonl
+memory/working.json
+memory/long_term/weather_history.json

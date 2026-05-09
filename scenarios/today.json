@@ -1,1 +1,24 @@
-{"council_portal_clashes": [{"ground_id": "henley_oval", "datetime_window": "2026-05-15T08:00/2026-05-15T10:00", "competing_event": "Community fun-run", "status": "pending", "note": "Pending council review."}]}
+{
+  "bom_heat": {
+    "5022": 38.0,
+    "5024": 38.0
+  },
+  "bom_lightning": {
+    "strikes_last_10min": [
+      {"lat": -34.9877, "lng": 138.5170, "time": "2026-05-10T06:43:00"}
+    ]
+  },
+  "bom_rain": {
+    "5022": 0.0,
+    "5024": 0.0
+  },
+  "council_portal_clashes": [
+    {
+      "ground_id": "henley_oval",
+      "datetime_window": "2026-05-15T08:00/2026-05-15T10:00",
+      "competing_event": "Community fun-run",
+      "status": "pending",
+      "note": "Pending council review."
+    }
+  ]
+}
