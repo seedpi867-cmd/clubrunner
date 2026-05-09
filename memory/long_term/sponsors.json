@@ -1,0 +1,20 @@
+{
+  "sp_bendigo": {
+    "contract_end": "2026-12-31",
+    "contract_value": 12000.0,
+    "id": "sp_bendigo",
+    "last_post_at": null,
+    "name": "Bendigo Bank Henley & Grange",
+    "posts_owed": 8,
+    "tier": "major"
+  },
+  "sp_hardware": {
+    "contract_end": "2026-12-31",
+    "contract_value": 2500.0,
+    "id": "sp_hardware",
+    "last_post_at": null,
+    "name": "Henley Hardware",
+    "posts_owed": 4,
+    "tier": "minor"
+  }
+}

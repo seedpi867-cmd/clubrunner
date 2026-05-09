@@ -1,0 +1,234 @@
+# Triage rules — deterministic-first classification.
+#
+# Order matters: the FIRST matching rule wins. Place the most-specific
+# (and especially safeguarding) rules at the top.
+#
+# Each rule:
+#   match: any of {sender_domain, sender_exact, subject_regex, body_regex,
+#                  source}
+#   set:   category, sentiment, priority (0-100), safeguarding, escalate,
+#          playbook
+#
+# Safeguarding patterns are checked separately by classifier.py against
+# safeguarding.trigger_patterns from config.yaml — they win over any rule.
+
+rules:
+  # ---- schedule ticks ----
+  - match: { source: "schedule", subject_regex: "newsletter" }
+    set:   { category: "newsletter_tick", priority: 60,
+             playbook: "newsletter", escalate: false }
+  - match: { source: "schedule", subject_regex: "Duty roster" }
+    set:   { category: "duty_tick", priority: 55,
+             playbook: "duty_reminder", escalate: false }
+  - match: { source: "schedule", subject_regex: "Payment chase" }
+    set:   { category: "payment_tick", priority: 50,
+             playbook: "payment_chase", escalate: false }
+  - match: { source: "schedule", subject_regex: "WWCC" }
+    set:   { category: "wwcc_tick", priority: 65,
+             playbook: "wwcc_check", escalate: false }
+  - match: { source: "schedule", subject_regex: "Committee briefing" }
+    set:   { category: "committee_tick", priority: 50,
+             playbook: "committee_brief", escalate: false }
+  - match: { source: "schedule", subject_regex: "Insurance check" }
+    set:   { category: "insurance_tick", priority: 50,
+             playbook: "insurance_check", escalate: false }
+  - match: { source: "schedule", subject_regex: "Match-day briefing" }
+    set:   { category: "match_day_tick", priority: 70,
+             playbook: "match_day_brief", escalate: false }
+
+  # ---- weather ----
+  - match: { source: "bom_heat" }
+    set:   { category: "weather_observation", priority: 40,
+             playbook: "heat_policy", escalate: false }
+  - match: { source: "bom_lightning" }
+    set:   { category: "weather_observation", priority: 45,
+             playbook: "lightning_policy", escalate: false }
+
+  # ---- google calendar reminders ----
+  # gcal mints inputs with sender 'gcal.reminder' at 7d/1d/2h before
+  # an event. The playbook handles audience routing and gate stack.
+  - match: { source: "gcal", sender_exact: "gcal.reminder" }
+    set:   { category: "gcal_reminder", priority: 40,
+             playbook: "event_reminder", escalate: false }
+
+  # ---- council ----
+  - match: { source: "council", subject_regex: "resolved" }
+    set:   { category: "council_resolved", priority: 35,
+             playbook: "council_clash_resolved", escalate: false }
+  # Council asking for proof of insurance — auto-forward, never
+  # escalate. Must precede the generic council/charlessturt rules
+  # because those flip escalate=true and would push a routine
+  # certificate request into Diane's queue. Subject OR body match —
+  # councils phrase it both ways ("Certificate of currency required",
+  # body "please send your current proof of insurance").
+  - match: { sender_domain: "charlessturt.sa.gov.au",
+             subject_regex: "(?i)(certificate of (currency|insurance)|proof of insurance|public liability cert|insurance cert)" }
+    set:   { category: "insurance_request", priority: 70,
+             playbook: "insurance_check", escalate: false }
+  - match: { sender_domain: "charlessturt.sa.gov.au",
+             body_regex: "(?i)(certificate of (currency|insurance)|proof of insurance|current.{0,15}insurance|your insurance.{0,15}(certificate|cert|coc)\\b)" }
+    set:   { category: "insurance_request", priority: 70,
+             playbook: "insurance_check", escalate: false }
+  - match: { source: "council" }
+    set:   { category: "council", priority: 70, escalate: true }
+  # IMAP from council bookings — same event the portal collector also sees,
+  # but inbound by email. Classify as council_inbound (not imap_unsorted)
+  # so the dashboard surfaces it under the right banner.
+  - match: { sender_domain: "charlessturt.sa.gov.au" }
+    set:   { category: "council_inbound", priority: 70, escalate: true }
+
+  # ---- league fixtures ----
+  - match: { sender_domain: "adelaidefootyjuniors.com.au",
+             subject_regex: "Round.*fixtures" }
+    set:   { category: "fixture_change", priority: 80,
+             playbook: "fixtures_ingest", escalate: false }
+  - match: { sender_domain: "adelaidefootyjuniors.com.au" }
+    set:   { category: "league_admin", priority: 60, escalate: false }
+
+  # ---- payments / playhq ----
+  - match: { source: "playhq", subject_regex: "Payment overdue" }
+    set:   { category: "payment_overdue", priority: 65,
+             playbook: "payment_chase", escalate: false }
+
+  # ---- sponsors ----
+  - match: { sender_domain: "bendigoadelaide.com.au" }
+    set:   { category: "sponsor", priority: 55,
+             playbook: "sponsor_inbound", escalate: true }
+  - match: { sender_domain: "henleyhardware.com.au" }
+    set:   { category: "sponsor", priority: 55,
+             playbook: "sponsor_inbound", escalate: true }
+
+  # ---- incident reports (injury / hospital / ambulance) ----
+  # Placed before refund/complaint because an injury-driven refund must
+  # open the incident first — the league has a 24h reporting clock that
+  # starts the moment we know, regardless of whether a refund is also
+  # being asked for. The brief surfaces both concerns to Diane.
+  - match: { subject_regex: "(?i)\\b(ambulance|broken|concuss|hospital|injur(y|ed)|knocked out|emergency|ER\\b|paramedic|stretcher)" }
+    set:   { category: "incident", priority: 95,
+             sentiment: "neg", escalate: true }
+  - match: { body_regex: "(?i)(called an ambulance|ambulance was called|taken to hospital|royal adelaide|knocked unconscious|broken (his|her|their) (arm|leg|wrist|collarbone|ankle|nose)|suspected concuss|fractured)" }
+    set:   { category: "incident", priority: 95,
+             sentiment: "neg", escalate: true }
+
+  # ---- coach match reports ----
+  # Sits ABOVE coach_resignation and complaint/refund: a routine post-
+  # match report from a coach is the high-volume case (14 per round) and
+  # must not be misclassified as a complaint just because the coach
+  # mentions a sub-par game ("disappointed in the second quarter") or as
+  # an injury just because they note a sprained ankle. Sender is
+  # cross-checked against the coach roster inside the playbook; an
+  # unknown sender opens a "verify" decision instead of replying.
+  - match: { subject_regex: "(?i)\\bmatch report\\b|\\b(round|game|weekly)\\s*\\d*\\s*report\\b|\\bpost-?match\\b" }
+    set:   { category: "match_report_inbound", priority: 35,
+             playbook: "match_report", escalate: false }
+
+  # ---- coach resignations ----
+  # Matched before complaint/refund: a coach pulling out is a recruiting
+  # emergency (replacement needed before next match), not a complaint.
+  # Always escalates — the brain pulls the team, the manager, and the
+  # next three fixtures into the brief; Diane makes the ask. Phrases are
+  # anchored on coach-context to avoid catching a parent who is "stepping
+  # back" from being on the canteen roster or "done with" something else.
+  - match: { subject_regex: "(?i)(resign|stepping? down|step (away|down) as (the )?coach|can(no|')t coach|done coaching)" }
+    set:   { category: "coach_admin", priority: 80,
+             sentiment: "neg", escalate: true,
+             playbook: "coach_resignation" }
+  - match: { body_regex: "(?i)(stepping (down|away) (as|from) (the )?coach|won'?t (be able to |)coach (anymore|next (week|round|season)|the rest of the season)|family (situation|reasons) means I can'?t (continue|coach)|resigning as (the )?coach|finish(ing)? up as coach)" }
+    set:   { category: "coach_admin", priority: 80,
+             sentiment: "neg", escalate: true,
+             playbook: "coach_resignation" }
+
+  # ---- coach no-show (training / match) ----
+  # A no-show is a recruiting / welfare problem with same-week pressure:
+  # the team had no coach at training tonight, or didn't have a coach at
+  # the match. Diane needs the brief — team, manager, history, options —
+  # and the no_shows counter must increment so a chronic pattern shows
+  # up in the dashboard's coach_reliability panel.
+  #
+  # Patterns are anchored on coach + (training|match|game|practice|round)
+  # so a parent saying "Coach wasn't at the BBQ" or "Coach didn't reply
+  # to my email" doesn't get mis-routed (those are different escalations).
+  # Order: AFTER resignation rules so "stepping down" doesn't fall into
+  # this bucket. Reaches the brain as cls=coach_no_show; the brain branch
+  # increments coach_memory.no_shows only when the sender resolves to a
+  # team manager (i.e. the credible reporter), never on a parent rumour.
+  - match: { subject_regex: "(?i)coach\\s+(no.?show|absent|missed|didn'?t\\s+(show|turn\\s+up|come))" }
+    set:   { category: "coach_no_show", priority: 78,
+             sentiment: "neg", escalate: true }
+  - match: { body_regex: "(?is)\\bcoach\\b[^.]{0,100}(no.?show|didn'?t\\s+(show|turn up|come|attend|appear)|wasn'?t\\s+(at|there)|skipped|absent|missing|didn'?t make it)[^.]{0,100}(training|match|game|practice|round\\b|trainin\\b|the\\s+u\\d+)" }
+    set:   { category: "coach_no_show", priority: 78,
+             sentiment: "neg", escalate: true }
+  - match: { body_regex: "(?i)(had no coach|no coach (was )?(at|there|showed|present|turned up)|coach was a no.?show)" }
+    set:   { category: "coach_no_show", priority: 78,
+             sentiment: "neg", escalate: true }
+
+  # ---- complaints / refunds (bigger than $200 — escalate) ----
+  - match: { subject_regex: "(?i)refund|money back" }
+    set:   { category: "refund_request", priority: 75,
+             sentiment: "neg", escalate: true }
+  - match: { subject_regex: "(?i)complaint|disappointed|unacceptable|outraged" }
+    set:   { category: "complaint", priority: 70,
+             sentiment: "neg", escalate: true }
+
+  # ---- TeamApp structured RSVP yes ----
+  # Sits ABOVE player_availability so a "confirmed in" RSVP doesn't
+  # trip the catch-all. Matches ONLY the canonical body the teamapp
+  # collector mints, not natural-language parent text — we don't want a
+  # parent typing "I'm in for sure" via SMS to be silent-recorded; that
+  # still wants the ack reply through availability_ack. The marker
+  # phrase "RSVP via TeamApp" is unique to the collector's reshape.
+  - match: { source: "teamapp",
+             body_regex: "confirmed in for this Saturday — RSVP via TeamApp" }
+    set:   { category: "availability_yes", priority: 10,
+             escalate: false }
+
+  # ---- parent illness / availability ----
+  # Subject-based for email — emails carry a useful subject.
+  - match: { subject_regex: "(?i)\\b(sick|injured|away|absent|unavailable)\\b" }
+    set:   { category: "player_availability", priority: 30,
+             playbook: "availability_ack", escalate: false }
+  # Body-based for SMS / FB — those channels have no useful subject.
+  # Anchored to the parent-availability phrasing so a generic "I'm sick
+  # of this club" complaint doesn't get mis-routed. The pattern needs
+  # an availability verb ('won't make', 'can't play') OR a name + 'sick'
+  # / 'flu' co-occurrence on the same line.
+  - match: { body_regex: "(?i)(won'?t (make|play|be at)|can'?t (make|play|be at|come)|will be away|can'?t train|missing (training|saturday)|out (this|next) (week|saturday)|(has|got) (the )?(flu|cold|chickenpox)|is sick|is injured)" }
+    set:   { category: "player_availability", priority: 30,
+             playbook: "availability_ack", escalate: false }
+
+  # ---- parent FAQ ----
+  # Training-time questions. Allow for 'when is U10 training', 'when does
+  # U10 train', 'training time'. Earlier the regex was too literal and
+  # an SMS 'when is U10 training this week' fell through to the catch-all.
+  #
+  # Each FAQ has its own classification (parent_faq_training vs
+  # parent_faq_register) so the playbook dispatcher in orchestrator
+  # routes directly off the rule that matched. Earlier the two rules
+  # shared category 'parent_faq' and the orchestrator re-discriminated
+  # by checking 'register' in body — which mis-routed messages like
+  # "where is U10 training? Do I register at PlayHQ?" to faq_register
+  # because the keyword appeared in a follow-up clause. Order still
+  # matters: the training pattern is checked first, so a message that
+  # asks about training AND mentions registration falls into training
+  # (the right call — answer the primary question; registration link is
+  # in the training reply too).
+  - match: { body_regex: "(?i)(when (is|does|are) ([a-z0-9 ]{0,40})?train(ing)?|where (is|are|does) ([a-z0-9 ]{0,30})?train|what time.*train|training time|training schedule)" }
+    set:   { category: "parent_faq_training", priority: 25,
+             playbook: "faq_training", escalate: false }
+  - match: { body_regex: "(?i)(how (do|can) (i|we|my (son|daughter|kid|child)) register|how to register|sign (my (son|daughter|kid|child) )?up|register (my (son|daughter|kid|child)|for (next |the )?season))" }
+    set:   { category: "parent_faq_register", priority: 25,
+             playbook: "faq_register", escalate: false }
+
+  # ---- catch-alls ----
+  - match: { source: "imap" }
+    set:   { category: "imap_unsorted", priority: 50, escalate: true }
+  - match: { source: "fb" }
+    set:   { category: "fb_unsorted", priority: 40, escalate: true }
+  - match: { source: "sms" }
+    set:   { category: "sms_unsorted", priority: 50, escalate: true }
+  # TeamApp catch-all: anything that didn't match faq/availability/
+  # safeguarding lands in the brain queue. Manager posts proposing a
+  # fixture forfeit, training time change, etc. show up here — Diane
+  # makes the call.
+  - match: { source: "teamapp" }
+    set:   { category: "teamapp_unsorted", priority: 45, escalate: true }

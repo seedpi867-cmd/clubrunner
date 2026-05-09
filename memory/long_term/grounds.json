@@ -1,0 +1,26 @@
+{
+  "fulham_north": {
+    "council": "West Torrens",
+    "id": "fulham_north",
+    "name": "Fulham North Reserve",
+    "postcode": "5024",
+    "quirks": "Council mowing Tue mornings \u2014 no early training Tue",
+    "surface": "kikuyu"
+  },
+  "grange_reserve": {
+    "council": "Charles Sturt",
+    "id": "grange_reserve",
+    "name": "Grange Reserve",
+    "postcode": "5022",
+    "quirks": "Shared with cricket Sept-Mar; check booking conflicts after Aug 1",
+    "surface": "couch_grass"
+  },
+  "henley_oval": {
+    "council": "Charles Sturt",
+    "id": "henley_oval",
+    "name": "Henley Oval",
+    "postcode": "5022",
+    "quirks": "Eastern oval poor drainage \u2014 closes after >20mm overnight rain",
+    "surface": "couch_grass"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "2026-05-09": [
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "henley_oval",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:03"
+    },
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "grange_reserve",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:03"
+    },
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "fulham_north",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:03"
+    },
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "henley_oval",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:05"
+    },
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "grange_reserve",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:05"
+    },
+    {
+      "forecast_max_c": 38.0,
+      "ground_id": "fulham_north",
+      "lightning_km": null,
+      "observed_at": "2026-05-09T11:59:05"
+    }
+  ]
+}

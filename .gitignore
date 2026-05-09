@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+edge/state/state.db
+edge/state/state.db-wal
+edge/state/state.db-shm
+run/
+logs/
+memory/short_term.jsonl

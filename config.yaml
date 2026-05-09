@@ -1,0 +1,228 @@
+# clubrunner config — Diane sets policy here, not in code.
+
+club:
+  name: "Henley & Grange Junior Football Club"
+  short_name: "HGJFC"
+  secretary_name: "Diane Pasquale"
+  secretary_email: "secretary@henleygrangejfc.com.au"
+  secretary_sms: "+61400000001"
+  timezone: "Australia/Adelaide"
+  league: "Adelaide Footy Juniors"
+  signature: |
+    Diane Pasquale
+    Secretary, Henley & Grange Junior Football Club
+
+cycle:
+  interval_minutes: 30
+  match_day_interval_minutes: 10     # tighter on Saturdays
+  off_hours_interval_minutes: 120
+  match_days: [5]                    # Saturday = 5 (Mon=0)
+  working_hours_start: "07:00"
+  working_hours_end: "21:00"
+
+# ---- weather policy: the lived-in reason this agent exists ----
+heat_policy:
+  applies_to_age_grades: ["auskick", "u8", "u9"]
+  cancel_threshold_c: 36.0
+  warning_threshold_c: 33.0          # below cancel — issue heat-stress warning, not cancel
+  forecast_horizon_hours: 24
+
+lightning_policy:
+  pause_distance_km: 10.0
+  resume_after_minutes: 30
+  applies_to_all_grades: true        # league rule
+  override_business_hours: true      # safety overrides quiet hours
+
+# ---- ground drainage closure ----
+# Each ground may carry a drainage_threshold_mm in the seed (Henley Oval
+# closes after >20mm overnight rain). When the rolling 24h rain crosses
+# the threshold and there are scheduled fixtures on that ground, the
+# playbook cancels them and drafts a closure broadcast that waits on
+# Diane's tap. Idempotent per ground per day.
+ground_drainage:
+  enabled: true
+  forecast_horizon_hours: 24
+
+# ---- communication gates ----
+broadcast:
+  approval_threshold_recipients: 50
+  daily_sms_cap_aud: 25.00
+  weekly_sms_cap_aud: 100.00
+  sms_cost_per_msg_aud: 0.06
+  per_recipient_per_day_max:
+    sms: 2
+    email: 4
+    fb_post: 1
+  dedup_window_minutes:
+    heat_policy: 360
+    ground_drainage: 1440              # one closure broadcast per ground per day
+    lightning_pause: 25
+    duty_reminder: 720
+    payment_chase: 4320              # 3 days
+    wwcc_reminder: 1440              # 1 day
+    committee_brief: 8640             # 6 days — one per ISO week
+    match_day_brief: 1200              # 20 hours — once per Saturday
+    event_reminder: 240              # 4h — segment includes window so
+                                     # 7d/1d/2h variants don't collide;
+                                     # this just blocks intra-cycle dupes
+  hours_strict:
+    sms: ["07:00", "21:00"]
+    email: ["06:00", "22:00"]
+
+# ---- registration / payment chase ----
+registration:
+  payment_due_days: 14
+  chase_cadence_days: [3, 7, 14]    # 3 stages
+  refund_human_threshold_aud: 200.00
+
+# ---- newsletter ----
+newsletter:
+  send_day_of_week: 6                # Sunday
+  draft_ready_at: "17:00"
+  sections: ["round_results", "next_round_fixtures", "presidents_column",
+             "sponsor_spotlight", "wwcc_reminders", "rego_reminders"]
+
+# ---- committee weekly briefing ----
+committee_brief:
+  enabled: true
+  send_day_of_week: 6                # Sunday — same day, after newsletter
+  send_at: "21:00"
+
+# ---- Saturday match-day briefing (personal — Diane only) ----
+# Fires once on each configured match day. The brief covers today's
+# fixtures, live weather per ground, unconfirmed duty slots, last
+# round's outstanding match reports, and any decisions still on Diane's
+# queue that touch today's run of play. Reach=1 (auto-sends).
+match_day_brief:
+  enabled: true
+  send_at: "06:00"
+
+# ---- WWCC ----
+wwcc:
+  reminder_days: [90, 60, 30, 14, 7, 1]
+  must_block_at_days: 0              # if expired, escalate immediately
+
+# ---- coach match-report reliability ----
+# Each fixture creates a 'report due' obligation that the team's coach is
+# expected to satisfy with an emailed match report. We register the
+# obligation only after a grace window past kickoff, so in-progress games
+# don't unfairly penalise coaches. A coach whose reliability falls below
+# the alert threshold is surfaced via decision once per fortnight (no
+# spam loops).
+coach_reliability:
+  enabled: true
+  report_due_after_hours: 72         # 3 days after kickoff a missing report counts
+  alert_threshold: 0.5               # < this → flag to Diane for a quiet word
+  alert_min_due: 4                   # but only after the coach has had ≥4 chances
+  alert_cooldown_days: 14            # don't reopen the same coach's flag inside 2 weeks
+
+# ---- sponsor obligation watch ----
+# Architecture promised "sponsor banner rotation per contract spec" runs
+# autonomously. Rotation works; what was missing was the cliff detector —
+# realising a sponsor cannot mathematically be delivered against contract
+# before season-end / contract-end, while there's still time to remedy
+# (mid-week social post, renewal credit, or a heads-up email). Without
+# this Diane discovers the shortfall when the bank's marketing manager
+# tallies banners at AGM, by which point it's a renewal-killer.
+sponsor_obligations:
+  enabled: true
+  weeks_buffer: 2                    # require posts_owed + 2 weeks of slack
+  alert_cooldown_days: 14            # don't re-flag a steady shortfall; do
+                                     # re-flag a worsening one
+  season_end: "2026-09-27"           # last Sunday of the regular season
+
+# ---- public liability insurance ----
+# Council requires a current Certificate of Currency on file for every
+# ground booking. Quarterly we forward the latest certificate; any
+# council request for proof of insurance is auto-forwarded; renewal
+# windows escalate to Diane (broker chase is a human action).
+insurance:
+  enabled: true
+  insurer: "Local Community Insurance Mutual"
+  policy_number: "POL-HGJFC-2026-1742"
+  cover_aud: 20000000.0
+  certificate_path: "memory/long_term/insurance_cert_2026.pdf"
+  expiry: "2026-09-30"
+  council_email: "council.bookings@charlessturt.sa.gov.au"
+  forward_cadence_days: 90
+  expiry_reminder_days: [60, 30, 14, 7, 1]
+  president_id: "comm_pres"
+  treasurer_id: "comm_treasurer"
+
+# ---- safeguarding (always escalates, never autosend) ----
+safeguarding:
+  trigger_patterns:
+    - "alone with"
+    - "uncomfortable"
+    - "private message"
+    - "messaged my child"
+    - "asked me not to tell"
+    - "took photos"
+  escalate_to:
+    - "comm_pres"
+
+# ---- collectors ----
+collectors:
+  bom_heat:
+    enabled: true
+    poll_minutes: 60
+    forecast_endpoint: "stub"        # stub = use sample fixture data; real = api.weather.bom.gov.au
+  bom_lightning:
+    enabled: true
+    poll_minutes: 10
+    radar_endpoint: "stub"
+  bom_rain:
+    enabled: true
+    poll_minutes: 30
+    endpoint: "stub"                  # stub = scenarios/today.json bom_rain map
+  imap:
+    enabled: true                    # uses local maildir under inputs/maildir/ by default
+    host: "imap.example.com"
+    inbox: "INBOX"
+    fallback_to_local_maildir: true
+  playhq:
+    enabled: true
+    base_url: "stub"
+    club_id: "henley-grange-jfc"
+  council_portal:
+    enabled: true
+    council: "Charles Sturt"
+    portal_url: "stub"
+  facebook:
+    enabled: false                   # Diane provides token; off by default
+  teamapp:
+    enabled: false
+  twilio_inbound:
+    enabled: true
+    webhook_path: "/sms/inbound"
+  schedule:
+    enabled: true
+  gcal:
+    enabled: true
+    poll_minutes: 30
+    # Plug a published Google Calendar ICS URL here to switch off stub
+    # mode. While empty/unset, gcal reads scenarios/today.json.
+    ics_url: ""
+
+# ---- brain ----
+brain:
+  cli_path: "claude"
+  model: "claude-haiku-4-5-20251001"
+  max_items_per_cycle: 6
+  dry_run: true                      # offline mode — brain stub. Flip to false in real ops.
+  max_seconds: 90
+
+# ---- triage ----
+triage:
+  use_local_llm: false               # rule-based first; ollama optional
+  ollama_model: "llama3.1:8b"
+
+# ---- health ----
+health:
+  breaker_trip_after_failures: 3
+  breaker_cooldown_cycles: 10
+  fail_fast_external_seconds: 8      # cap on any single external call
+
+dashboard:
+  bind: "127.0.0.1"
+  port: 8089

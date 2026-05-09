@@ -1,0 +1,156 @@
+{
+  "coach_alex": {
+    "id": "coach_alex",
+    "name": "Alex Tran",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-05-19"
+  },
+  "coach_dean": {
+    "id": "coach_dean",
+    "name": "Dean O'Brien",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2027-01-10"
+  },
+  "coach_helen": {
+    "id": "coach_helen",
+    "name": "Helen Wu",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-07-25"
+  },
+  "coach_jamie": {
+    "id": "coach_jamie",
+    "name": "Jamie Foord",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-09-02"
+  },
+  "coach_louise": {
+    "id": "coach_louise",
+    "name": "Louise Connor",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-12-15"
+  },
+  "coach_marko": {
+    "id": "coach_marko",
+    "name": "Marko Petrovi\u0107",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-08-15"
+  },
+  "coach_nina": {
+    "id": "coach_nina",
+    "name": "Nina Ashworth",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-06-30"
+  },
+  "coach_pete": {
+    "id": "coach_pete",
+    "name": "Pete Karras",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-11-04"
+  },
+  "coach_ravi": {
+    "id": "coach_ravi",
+    "name": "Ravi Mehta",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2027-03-20"
+  },
+  "coach_sara": {
+    "id": "coach_sara",
+    "name": "Sara Wilkins",
+    "no_shows": 0,
+    "reliability": 1.0,
+    "report_submission_rate": null,
+    "reports_due": 0,
+    "reports_submitted": 0,
+    "role": "coach",
+    "wwcc_expiry": "2026-04-22"
+  },
+  "mgr_anita": {
+    "id": "mgr_anita",
+    "name": "Anita Goldsmith",
+    "no_shows": null,
+    "reliability": null,
+    "report_submission_rate": null,
+    "reports_due": null,
+    "reports_submitted": null,
+    "role": "manager",
+    "wwcc_expiry": null
+  },
+  "mgr_brett": {
+    "id": "mgr_brett",
+    "name": "Brett Tomlinson",
+    "no_shows": null,
+    "reliability": null,
+    "report_submission_rate": null,
+    "reports_due": null,
+    "reports_submitted": null,
+    "role": "manager",
+    "wwcc_expiry": null
+  },
+  "mgr_kelly": {
+    "id": "mgr_kelly",
+    "name": "Kelly Jenner",
+    "no_shows": null,
+    "reliability": null,
+    "report_submission_rate": null,
+    "reports_due": null,
+    "reports_submitted": null,
+    "role": "manager",
+    "wwcc_expiry": null
+  },
+  "mgr_priya": {
+    "id": "mgr_priya",
+    "name": "Priya Shah",
+    "no_shows": null,
+    "reliability": null,
+    "report_submission_rate": null,
+    "reports_due": null,
+    "reports_submitted": null,
+    "role": "manager",
+    "wwcc_expiry": null
+  }
+}

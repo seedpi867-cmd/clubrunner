@@ -1,0 +1,129 @@
+{
+  "cycle_id": 2,
+  "started_at": "2026-05-09T11:59:05",
+  "duration_s": 0.21,
+  "collect": {
+    "schedule": {
+      "ingested": 0,
+      "ticks": []
+    },
+    "bom_heat": {
+      "observed": 3,
+      "forecasts": {
+        "henley_oval": 38.0,
+        "grange_reserve": 38.0,
+        "fulham_north": 38.0
+      }
+    },
+    "bom_lightning": {
+      "observed": 3,
+      "nearest_km": {
+        "henley_oval": null,
+        "grange_reserve": null,
+        "fulham_north": null
+      },
+      "strike_count": 0
+    },
+    "bom_rain": {
+      "observed": 3,
+      "rain_24h_mm": {
+        "henley_oval": 0.0,
+        "grange_reserve": 0.0,
+        "fulham_north": 0.0
+      }
+    },
+    "council_portal": {
+      "ingested": 0,
+      "clashes": 1
+    },
+    "playhq": {
+      "ingested": 0,
+      "overdue_count": 0
+    },
+    "imap_secretary": {
+      "ingested": 0
+    },
+    "sms_inbound": {
+      "ingested": 0
+    },
+    "facebook_page": {
+      "ingested": 0
+    },
+    "teamapp": {
+      "ingested": 0
+    },
+    "gcal": {
+      "ingested": 0,
+      "events_seen": 0,
+      "events_added": 0,
+      "reminders_minted": [],
+      "marked_past": 0
+    }
+  },
+  "triage": {
+    "classify": {
+      "classified": 0,
+      "to_escalate": 0,
+      "safeguarding": 0
+    },
+    "route": {
+      "playbook": [],
+      "brain": [],
+      "ignored": [],
+      "silent": [],
+      "overflow": []
+    }
+  },
+  "brain": {
+    "thoughts": []
+  },
+  "execute": {
+    "playbooks_fired": [
+      {
+        "affected": 0,
+        "cancelled": 0,
+        "warnings": 0,
+        "cancel_drafts": [],
+        "warn_drafts": []
+      },
+      {
+        "active_grounds": 3,
+        "actions": []
+      },
+      {
+        "closures": [],
+        "skipped": []
+      },
+      {
+        "ok": true,
+        "fixtures_scanned": 0,
+        "newly_registered": 0,
+        "reliabilities": {},
+        "alerts": []
+      },
+      {
+        "ok": true,
+        "sponsors_scanned": 2,
+        "alerts": []
+      }
+    ]
+  },
+  "reflect": {
+    "memory": {
+      "parents": 8,
+      "sponsors": 2,
+      "grounds": 3,
+      "coaches": 14,
+      "incidents": 0
+    }
+  },
+  "stats": {
+    "items_in": 0,
+    "classified": 0,
+    "drafts_created": 0,
+    "broadcasts_sent": 0,
+    "decisions_opened": 0,
+    "policies_fired": 0,
+    "notes": "collect=11; playbooks=0; brain=0"
+  }
+}

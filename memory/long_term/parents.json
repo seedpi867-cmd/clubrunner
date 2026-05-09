@@ -1,0 +1,50 @@
+{
+  "p_amelia": {
+    "channel_pref": "sms",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Amelia Chen"
+  },
+  "p_bryan": {
+    "channel_pref": "email",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Bryan Mosley"
+  },
+  "p_dimitri": {
+    "channel_pref": "email",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Dimitri Roussos"
+  },
+  "p_gita": {
+    "channel_pref": "sms",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Gita Banerjee"
+  },
+  "p_holly": {
+    "channel_pref": "sms",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Holly Underhill"
+  },
+  "p_kev": {
+    "channel_pref": "email",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Kev Dorling"
+  },
+  "p_marcus": {
+    "channel_pref": "email",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Marcus Hill"
+  },
+  "p_sandra": {
+    "channel_pref": "sms",
+    "complaint_count": 0,
+    "last_complaint_at": null,
+    "name": "Sandra Loretti"
+  }
+}
